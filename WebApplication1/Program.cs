@@ -7,11 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddScoped<Iinstructor, InstructorADO>();
+
 //Dependency Injection
-builder.Services.AddSingleton<Iinstructor, InstructorDal>();
+//builder.Services.AddSingleton<Iinstructor, InstructorDal>();
 
 //Dependecy Injection
-builder.Services.AddSingleton<ICategory, CategoryDal>();
+//builder.Services.AddSingleton<ICategory, CategoryDal>();
 var app = builder.Build();
 
 
