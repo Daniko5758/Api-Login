@@ -2,7 +2,7 @@
     using WebApplication1.Models;
 
     namespace WebApplication1.Data;
-
+/*
     public class CategoryDal : ICategory
     {
         private List<Category> _categories = new List<Category>();
@@ -62,3 +62,5 @@
             return existingCategory;
         }
     }
+
+*/

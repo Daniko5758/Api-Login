@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<Iinstructor, InstructorADO>();
+builder.Services.AddScoped<ICategory, CategoryADO>();
+builder.Services.AddSingleton<ICourse, CourseADO>();
 
 //Dependency Injection
 //builder.Services.AddSingleton<Iinstructor, InstructorDal>();
@@ -82,6 +84,35 @@ app.MapPut("api/v1/categories", (ICategory categoryData,Category category)=>
 app.MapDelete("api/v1/categories/{id}", (ICategory categoryData,int id) =>
 {
     categoryData.DeleteCategory(id);
+    return Results.NoContent();
+});
+
+app.MapGet("api/v1/courses", (ICourse courseData) =>
+{
+    var courses = courseData.GetCourses();
+    return courses;
+});
+
+app.MapGet("api/v1/courses/{id}", (ICourse courseData, int id) =>
+{
+    var course = courseData.GetCourseById(id);
+    return course;
+});
+
+app.MapPost("api/v1/courses", (ICourse courseData, Course course)=>
+{
+    var newCourse = courseData.AddCourse(course);
+    return newCourse;
+});
+
+app.MapPut("api/v1/courses", (ICourse courseData, Course course)=>
+{
+    var updatedCourse = courseData.UpdateCourse(course);
+    return updatedCourse;
+});
+app.MapDelete("api/v1/courses/{id}", (ICourse courseData, int id) =>
+{
+    courseData.DeleteCourse(id);
     return Results.NoContent();
 });
 

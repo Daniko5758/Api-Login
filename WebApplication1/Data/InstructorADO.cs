@@ -3,89 +3,149 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
+using WebApplication1.Models;
+
 
 namespace WebApplication1.Data
 {
-    public class InstructorADO
+    public class InstructorADO : Iinstructor
     {
-        public class InstructorADO : Iinstructor
-    {
-        private IConfiguration _configuration;
-        private string connStr = string.Empty;
+        private readonly string _connStr;
+
         public InstructorADO(IConfiguration configuration)
         {
-            _configuration = configuration;
-            connStr = _configuration.GetConnectionString("DefaultConnection");
+            _connStr = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public Instructor addInstructor(Instructor Instructor)
+
+        public Instructor AddInstructor(Instructor instructor)
         {
-             using (SqlConnection connection = new SqlConnection(connStr))
+            using (SqlConnection connection = new SqlConnection(_connStr))
             {
-                string strsql = @"DELETE FROM Instructor WHERE InstructorID = @InstructorID";
-                SqlCommand cmd = new SqlCommand(strsql, connection);
-                cmd.Parameters.AddWithValue("@InstructorID", Instructor.InstructorID);
+                string sql = @"INSERT INTO Instructor (InstructorName, InstructorEmail, InstructorPhoneNumber, InstructorAddress, InstructorCity)
+                               VALUES (@InstructorName, @InstructorEmail, @InstructorPhoneNumber, @InstructorAddress, @InstructorCity);
+                               SELECT SCOPE_IDENTITY();";
+
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                cmd.Parameters.AddWithValue("@InstructorName", instructor.InstructorName);
+                cmd.Parameters.AddWithValue("@InstructorEmail", instructor.InstructorEmail);
+                cmd.Parameters.AddWithValue("@InstructorPhoneNumber", instructor.InstructorPhoneNumber);
+                cmd.Parameters.AddWithValue("@InstructorAddress", instructor.InstructorAddress);
+                cmd.Parameters.AddWithValue("@InstructorCity", instructor.InstructorCity);
+
                 connection.Open();
-                cmd.ExecuteNonQuery();
-                cmd.Dispose();
+                instructor.InstructorId = Convert.ToInt32(cmd.ExecuteScalar()); // Ambil ID baru
                 connection.Close();
             }
-            return Instructor;
+            return instructor;
         }
 
-        public void deleteInstructor(int InstructorID)
-        {
-             using (SqlConnection connection = new SqlConnection(connStr))
-            {
-                string strsql = @"DELETE FROM Instructor WHERE InstructorID = @InstructorID";
-                SqlCommand cmd = new SqlCommand(strsql, connection);
-                cmd.Parameters.AddWithValue("@InstructorID", InstructorID);
-                connection.Open();
-                cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                connection.Close();
-            }
-        }
-
-        public Instructor GetInstructorById(int InstructorID)
-        {
-            throw new NotImplementedException();
-        }
 
         public IEnumerable<Instructor> GetInstructors()
         {
             List<Instructor> instructors = new List<Instructor>();
-            using(SqlConnection connection = new SqlConnection(connStr))
+
+            using (SqlConnection connection = new SqlConnection(_connStr))
             {
-                string strsql = @"SELECT * FROM Instructor ORDER BY InstructorName";
-                SqlCommand cmd = new SqlCommand(strsql, connection);
+                string sql = "SELECT * FROM Instructor ORDER BY InstructorName";
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                
                 connection.Open();
                 SqlDataReader dr = cmd.ExecuteReader();
-                if(dr.HasRows)
+
+                while (dr.Read())
                 {
-                    while(dr.Read())
+                    instructors.Add(new Instructor
                     {
-                        Instructor instructor = new();
-                        instructor.InstructorID = Convert.ToInt32(dr["InstructorID"]);
-                        instructor.InstructorName = dr["InstructorName"].ToString();
-                        instructor.InstructorEmail = dr["InstructorEmail"].ToString();
-                        instructor.InstructorPhone = dr["InstructorPhone"].ToString();
-                        instructor.InstructorAddress = dr["InstructorAddress"].ToString();
-                        instructor.InstructorCity = dr["InstructorCity"].ToString();
-                        instructors.Add(instructor);
-                    }
+                        InstructorId = Convert.ToInt32(dr["InstructorID"]),
+                        InstructorName = dr["InstructorName"].ToString(),
+                        InstructorEmail = dr["InstructorEmail"].ToString(),
+                        InstructorPhoneNumber = dr["InstructorPhoneNumber"].ToString(),
+                        InstructorAddress = dr["InstructorAddress"].ToString(),
+                        InstructorCity = dr["InstructorCity"].ToString()
+                    });
                 }
+
                 dr.Close();
-                cmd.Dispose();
                 connection.Close();
             }
             return instructors;
         }
 
-        public Instructor updateInstructor(Instructor Instructor)
+    // READ - Dapatkan Instruktur Berdasarkan ID
+        public Instructor GetInstructorById(int instructorId)
         {
-            throw new NotImplementedException();
+            Instructor instructor = null;
+
+            using (SqlConnection connection = new SqlConnection(_connStr))
+            {
+                string sql = "SELECT * FROM Instructor WHERE InstructorID = @InstructorID";
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                cmd.Parameters.AddWithValue("@InstructorID", instructorId);
+
+                connection.Open();
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                if (dr.Read())
+                {
+                    instructor = new Instructor
+                    {
+                        InstructorId = Convert.ToInt32(dr["InstructorID"]),
+                        InstructorName = dr["InstructorName"].ToString(),
+                        InstructorEmail = dr["InstructorEmail"].ToString(),
+                        InstructorPhoneNumber = dr["InstructorPhoneNumber"].ToString(),
+                        InstructorAddress = dr["InstructorAddress"].ToString(),
+                        InstructorCity = dr["InstructorCity"].ToString()
+                    };
+                }
+
+                dr.Close();
+                connection.Close();
+            }
+            return instructor;
+        }
+
+        // UPDATE - Perbarui Data Instruktur
+        public Instructor UpdateInstructor(Instructor instructor)
+        {
+            using (SqlConnection connection = new SqlConnection(_connStr))
+            {
+                string sql = @"UPDATE Instructor 
+                               SET InstructorName = @InstructorName,
+                                   InstructorEmail = @InstructorEmail,
+                                   InstructorPhoneNumber = @InstructorPhoneNumber,
+                                   InstructorAddress = @InstructorAddress,
+                                   InstructorCity = @InstructorCity
+                               WHERE InstructorID = @InstructorID";
+
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                cmd.Parameters.AddWithValue("@InstructorID", instructor.InstructorId);
+                cmd.Parameters.AddWithValue("@InstructorName", instructor.InstructorName);
+                cmd.Parameters.AddWithValue("@InstructorEmail", instructor.InstructorEmail);
+                cmd.Parameters.AddWithValue("@InstructorPhoneNumber", instructor.InstructorPhoneNumber);
+                cmd.Parameters.AddWithValue("@InstructorAddress", instructor.InstructorAddress);
+                cmd.Parameters.AddWithValue("@InstructorCity", instructor.InstructorCity);
+
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+            return instructor;
+        }
+
+        // DELETE - Hapus Instruktur
+        public void DeleteInstructor(int instructorId)
+        {
+            using (SqlConnection connection = new SqlConnection(_connStr))
+            {
+                string sql = "DELETE FROM Instructor WHERE InstructorID = @InstructorID";
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                cmd.Parameters.AddWithValue("@InstructorID", instructorId);
+
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+            }
         }
     }
     }
-}
