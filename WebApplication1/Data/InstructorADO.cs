@@ -72,7 +72,7 @@ namespace WebApplication1.Data
             return instructors;
         }
 
-    // READ - Dapatkan Instruktur Berdasarkan ID
+
         public Instructor GetInstructorById(int instructorId)
         {
             Instructor instructor = null;

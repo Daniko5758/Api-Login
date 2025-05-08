@@ -8,8 +8,8 @@ namespace WebApplication1.Data
 {
     public interface ICourse
     {
-    IEnumerable<ViewCourseWithCategory> GetCourses();
-    ViewCourseWithCategory GetCourseById(int CourseID);
+    IEnumerable<Course> GetCourses();
+    Course GetCourseById(int CourseID);
     Course AddCourse(Course course);
     Course UpdateCourse(Course course);
     void DeleteCourse(int CourseID);

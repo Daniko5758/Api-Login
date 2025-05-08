@@ -7,12 +7,10 @@ namespace WebApplication1.Models
 {
     public class Course
     {
-        public int CourseID { get; set; }   
+        public int CourseID { get; set; }  
         public string CourseName { get; set; } = null!;
-
         public String CourseDescription { get; set;} = null!;
         public double Duration { get; set; }
-
         public int CategoryID { get; set; } 
 
 

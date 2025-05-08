@@ -159,5 +159,15 @@ namespace WebApplication1.Data
                 }
             }
         }
+
+        Course ICourse.GetCourseById(int CourseID)
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerable<Course> ICourse.GetCourses()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
