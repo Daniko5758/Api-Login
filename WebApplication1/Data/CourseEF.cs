@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
 
 namespace WebApplication1.Data
 {
-    public class CourseEF : ICourse
+     public class CourseEF : ICourse
     {
         private readonly ApplicationDbContext _context;
 
@@ -17,16 +18,24 @@ namespace WebApplication1.Data
 
         public Course AddCourse(Course course)
         {
-            try
-            {
+           try
+           {
+                if (course == null)
+                {
+                    throw new ArgumentNullException(nameof(course), "Course cannot be null");
+                }
                 _context.Courses.Add(course);
                 _context.SaveChanges();
                 return course;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error adding course", ex);
-            }
+           }
+           catch (DbUpdateException dbex)
+           {
+               throw new Exception("Error adding course to the database", dbex);
+           }
+           catch (System.Exception ex)
+           {
+               throw new Exception("An error occurred while adding the course", ex);
+           }
         }
 
         public void DeleteCourse(int CourseID)
@@ -48,6 +57,14 @@ namespace WebApplication1.Data
             }
         }
 
+        public IEnumerable<Course> GetAllCourse()
+        {
+            var courses = from c in _context.Courses.Include(c => c.category)
+                          orderby c.CourseName descending
+                          select c;
+            return courses;
+        }
+
         public Course GetCourseById(int CourseID)
         {
             var course = _context.Courses.FirstOrDefault(c => c.CourseID == CourseID);
@@ -58,9 +75,25 @@ namespace WebApplication1.Data
             return course;
         }
 
+        public Course GetCourseByIdCourse(int CourseID)
+        {
+            var course = _context.Courses.Include(c => c.category)
+                .FirstOrDefault(c => c.CourseID == CourseID);
+            if (course == null)
+            {
+                throw new Exception("Course not found");
+            }
+            return course;
+        }
+
         public IEnumerable<Course> GetCourses()
         {
             return _context.Courses.OrderBy(c => c.CourseName).ToList();
+        }
+
+        public IEnumerable<Course> GetCoursesByCategoryId(int categoryId)
+        {
+            throw new NotImplementedException();
         }
 
         public Course UpdateCourse(Course course)

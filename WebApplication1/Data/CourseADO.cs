@@ -78,7 +78,17 @@ namespace WebApplication1.Data
             }
         }
 
+        public IEnumerable<Course> GetAllCourse()
+        {
+            throw new NotImplementedException();
+        }
+
         public ViewCourseWithCategory GetCourseById(int CourseID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Course GetCourseByIdCourse(int CourseID)
         {
             throw new NotImplementedException();
         }
@@ -122,6 +132,11 @@ namespace WebApplication1.Data
                     conn.Close();
                 }
              }
+        }
+
+        public IEnumerable<Course> GetCoursesByCategoryId(int categoryId)
+        {
+            throw new NotImplementedException();
         }
 
         public Course UpdateCourse(Course course)

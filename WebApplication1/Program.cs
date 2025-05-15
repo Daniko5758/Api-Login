@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
+using WebApplication1.DTO;
 using WebApplication1.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +20,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 //Dependecy Injection
-// builder.Services.AddScoped<ICategory, CategoryEF>();
+builder.Services.AddScoped<ICategory, CategoryEF>();
 builder.Services.AddScoped<ICourse, CourseEF>();
 var app = builder.Build();
 
@@ -89,37 +90,98 @@ app.UseHttpsRedirection();
 // app.MapDelete("api/v1/categories/{id}", (ICategory categoryData,int id) =>
 // {
 //     categoryData.DeleteCategory(id);
-//     return Results.NoContent();
+//     return Results.NoContent();  
 // });
 
 app.MapGet("api/v1/courses", (ICourse courseData) =>
 {
-    var courses = courseData.GetCourses();
-    return courses;
+    List<CourseDTO> courseDTOs = new List<CourseDTO>();
+    var courses = courseData.GetAllCourse();
+    foreach (var course in courses)
+    {
+        CourseDTO courseDTO = new CourseDTO
+        {
+            CourseID = course.CourseID,
+            CourseName = course.CourseName,
+            CourseDescription = course.CourseDescription,
+            Duration = course.Duration,
+            category = new CategoryDTO
+            {
+                CategoryID = course.category.CategoryID,
+                CategoryName = course.category.CategoryName
+            }
+        };
+        courseDTOs.Add(courseDTO);
+    }
+    return courseDTOs;
 });
 
 app.MapGet("api/v1/courses/{id}", (ICourse courseData, int id) =>
 {
-    var course = courseData.GetCourseById(id);
-    return course;
+    var course = courseData.GetCourseByIdCourse(id);
+    if (course == null)
+    {
+        return Results.NotFound();
+    }
+    CourseDTO courseDTO = new CourseDTO
+    {
+        CourseID = course.CourseID,
+        CourseName = course.CourseName,
+        CourseDescription = course.CourseDescription,
+        Duration = course.Duration,
+        category = new CategoryDTO
+        {
+            CategoryID = course.category.CategoryID,
+            CategoryName = course.category.CategoryName
+        }
+    };
+    return Results.Ok(courseDTO);
 });
 
-app.MapPost("api/v1/courses", (ICourse courseData, Course course)=>
+app.MapPost("api/v1/courses", (ICourse courseData, CourseAddDTO courseAddDTO)=>
 {
-    var newCourse = courseData.AddCourse(course);
-    return newCourse;
+    Course course = new Course
+    {
+        CourseName = courseAddDTO.CourseName,
+        CourseDescription = courseAddDTO.CourseDescription,
+        Duration = courseAddDTO.Duration,
+        CategoryID = courseAddDTO.CategoryID
+    };
+    try
+    {
+        var newCourse = courseData.AddCourse(course);
+        CourseDTO courseDTO = new CourseDTO
+        {
+            CourseName = newCourse.CourseName,
+            CourseDescription = newCourse.CourseDescription,
+            Duration = newCourse.Duration,
+            category = new CategoryDTO
+            {
+                CategoryID = newCourse.CourseID
+            }
+        };
+        return Results.Created($"/api/v1/courses/{newCourse.CourseID}", courseDTO); 
+    }
+    catch (DbUpdateException dbex)
+    {
+        throw new Exception("Error adding course to the database", dbex);
+    }
+    catch (System.Exception ex)
+    {
+        throw new Exception("An error occurred while adding the course", ex);
+    }
 });
 
-app.MapPut("api/v1/courses", (ICourse courseData, Course course)=>
-{
-    var updatedCourse = courseData.UpdateCourse(course);
-    return updatedCourse;
-});
-app.MapDelete("api/v1/courses/{id}", (ICourse courseData, int id) =>
-{
-    courseData.DeleteCourse(id);
-    return Results.NoContent();
-});
+// app.MapPut("api/v1/courses", (ICourse courseData, Course course)=>
+// {
+//     var updatedCourse = courseData.UpdateCourse(course);
+//     return updatedCourse;
+// });
+// app.MapDelete("api/v1/courses/{id}", (ICourse courseData, int id) =>
+// {
+//     courseData.DeleteCourse(id);
+//     return Results.NoContent();
+// });
 
 app.Run();
 

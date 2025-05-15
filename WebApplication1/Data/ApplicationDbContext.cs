@@ -11,11 +11,10 @@ namespace WebApplication1.Data
     {
         public ApplicationDbContext (DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-
         }
-
         public DbSet<Category> Categories { get; set; } = null;
-        public DbSet<Course> Courses { get; set; } = null!;
+        public DbSet<Course> Courses { get; set; } = null!; 
+        public DbSet<Instructor> Instructors { get; set; } = null!;
 
     }
 }
