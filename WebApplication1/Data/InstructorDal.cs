@@ -12,8 +12,8 @@ public class InstructorDal : Iinstructor
     {
         _instructors = new List<Instructor>()
         {
-            new Instructor() { InstructorId = 1, InstructorName = "Daniko Sutopo", InstructorEmail = "daniko@gmail.com", InstructorPhoneNumber = "123-456-7890", InstructorAddress = "123 Main St", InstructorCity = "New York" },
-            new Instructor() { InstructorId = 2, InstructorName = "Christian Bagas", InstructorEmail = "christian@gmail.com", InstructorPhoneNumber = "987-654-3210", InstructorAddress = "456 Elm St", InstructorCity = "Los Angeles" },
+            new Instructor() { InstructorID = 1, InstructorName = "Daniko Sutopo", InstructorEmail = "daniko@gmail.com", InstructorPhoneNumber = "123-456-7890", InstructorAddress = "123 Main St", InstructorCity = "New York" },
+            new Instructor() { InstructorID = 2, InstructorName = "Christian Bagas", InstructorEmail = "christian@gmail.com", InstructorPhoneNumber = "987-654-3210", InstructorAddress = "456 Elm St", InstructorCity = "Los Angeles" },
         };
     }
 
@@ -24,7 +24,7 @@ public class InstructorDal : Iinstructor
 
     public Instructor GetInstructorById(int instructorId)
     {
-        var instructor = _instructors.FirstOrDefault(i => i.InstructorId == instructorId);
+        var instructor = _instructors.FirstOrDefault(i => i.InstructorID == instructorId);
         if (instructor == null)
         {
             throw new Exception("Instructor not found");
@@ -49,7 +49,7 @@ public class InstructorDal : Iinstructor
 
     public Instructor UpdateInstructor(Instructor instructor)
     {
-        var existingInstructor = GetInstructorById(instructor.InstructorId);
+        var existingInstructor = GetInstructorById(instructor.InstructorID);
         if (existingInstructor != null)
         {
             existingInstructor.InstructorName = instructor.InstructorName;
@@ -59,5 +59,20 @@ public class InstructorDal : Iinstructor
             existingInstructor.InstructorCity = instructor.InstructorCity;
         }
         return existingInstructor;
+    }
+
+    public IEnumerable<Instructor> GetInstructorByCourseId(int courseID)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<Instructor> GetAllInstructor()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Instructor GetInstructorByIdInstructor(int InstructorId)
+    {
+        throw new NotImplementedException();
     }
 }

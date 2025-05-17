@@ -50,6 +50,11 @@ namespace WebApplication1.Data
             }
         }
 
+        public Course AddCourses(Course course)
+        {
+            throw new NotImplementedException();
+        }
+
         public void DeleteCourse(int CourseID)
         {
             using(SqlConnection conn = new SqlConnection(connStr))
@@ -76,6 +81,11 @@ namespace WebApplication1.Data
                     conn.Close();
                 }
             }
+        }
+
+        public void DeleteCourses(int id)
+        {
+            throw new NotImplementedException();
         }
 
         public IEnumerable<Course> GetAllCourse()
@@ -175,14 +185,20 @@ namespace WebApplication1.Data
             }
         }
 
-        Course ICourse.GetCourseById(int CourseID)
+        public Course UpdateCourses(Course course)
         {
             throw new NotImplementedException();
         }
 
-        IEnumerable<Course> ICourse.GetCourses()
+        bool ICourse.DeleteCourse(int id)
         {
             throw new NotImplementedException();
         }
+
+        List<Course> ICourse.GetAllCourse()
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

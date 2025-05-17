@@ -34,7 +34,7 @@ namespace WebApplication1.Data
                 cmd.Parameters.AddWithValue("@InstructorCity", instructor.InstructorCity);
 
                 connection.Open();
-                instructor.InstructorId = Convert.ToInt32(cmd.ExecuteScalar()); // Ambil ID baru
+                instructor.InstructorID = Convert.ToInt32(cmd.ExecuteScalar()); // Ambil ID baru
                 connection.Close();
             }
             return instructor;
@@ -57,7 +57,7 @@ namespace WebApplication1.Data
                 {
                     instructors.Add(new Instructor
                     {
-                        InstructorId = Convert.ToInt32(dr["InstructorID"]),
+                        InstructorID = Convert.ToInt32(dr["InstructorID"]),
                         InstructorName = dr["InstructorName"].ToString(),
                         InstructorEmail = dr["InstructorEmail"].ToString(),
                         InstructorPhoneNumber = dr["InstructorPhoneNumber"].ToString(),
@@ -90,7 +90,7 @@ namespace WebApplication1.Data
                 {
                     instructor = new Instructor
                     {
-                        InstructorId = Convert.ToInt32(dr["InstructorID"]),
+                        InstructorID = Convert.ToInt32(dr["InstructorID"]),
                         InstructorName = dr["InstructorName"].ToString(),
                         InstructorEmail = dr["InstructorEmail"].ToString(),
                         InstructorPhoneNumber = dr["InstructorPhoneNumber"].ToString(),
@@ -119,7 +119,7 @@ namespace WebApplication1.Data
                                WHERE InstructorID = @InstructorID";
 
                 SqlCommand cmd = new SqlCommand(sql, connection);
-                cmd.Parameters.AddWithValue("@InstructorID", instructor.InstructorId);
+                cmd.Parameters.AddWithValue("@InstructorID", instructor.InstructorID);
                 cmd.Parameters.AddWithValue("@InstructorName", instructor.InstructorName);
                 cmd.Parameters.AddWithValue("@InstructorEmail", instructor.InstructorEmail);
                 cmd.Parameters.AddWithValue("@InstructorPhoneNumber", instructor.InstructorPhoneNumber);
@@ -146,6 +146,21 @@ namespace WebApplication1.Data
                 cmd.ExecuteNonQuery();
                 connection.Close();
             }
+        }
+
+        public IEnumerable<Instructor> GetInstructorByCourseId(int courseID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<Instructor> GetAllInstructor()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Instructor GetInstructorByIdInstructor(int InstructorId)
+        {
+            throw new NotImplementedException();
         }
     }
     }

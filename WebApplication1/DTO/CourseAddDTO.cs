@@ -7,10 +7,12 @@ namespace WebApplication1.DTO
 {
     public class CourseAddDTO
     {
-        public string CourseName { get; set; } = null!;
-        public String CourseDescription { get; set;} = null!;
-        public double Duration { get; set; }
-        public int CategoryID { get; set; } 
+    public string CourseName { get; set; }
+    public string CourseDescription { get; set; }
+    public double Duration { get; set; }
+    public int CategoryID { get; set; }
+    public int InstructorID { get; set; } // Tambahan
+        
 
     }
 }
