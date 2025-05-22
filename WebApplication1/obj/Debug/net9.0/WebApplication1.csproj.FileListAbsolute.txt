@@ -166,3 +166,5 @@ D:\WebApplication1\WebApplication1\obj\Debug\net9.0\refint\WebApplication1.dll
 D:\WebApplication1\WebApplication1\obj\Debug\net9.0\WebApplication1.pdb
 D:\WebApplication1\WebApplication1\obj\Debug\net9.0\WebApplication1.genruntimeconfig.cache
 D:\WebApplication1\WebApplication1\obj\Debug\net9.0\ref\WebApplication1.dll
+D:\WebApplication1\WebApplication1\bin\Debug\net9.0\AutoMapper.dll
+D:\WebApplication1\WebApplication1\bin\Debug\net9.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

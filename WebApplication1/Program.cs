@@ -1,7 +1,9 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.DTO;
 using WebApplication1.Models;
+using WebApplication1.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ICategory, CategoryEF>();
 builder.Services.AddScoped<ICourse, CourseEF>();
 builder.Services.AddScoped<Iinstructor, InstructorEF>();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 var app = builder.Build();
 
 
@@ -34,11 +37,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("api/v1/instructors", (Iinstructor instructorData) =>
-{
-    var instructors = instructorData.GetInstructors();
-    return instructors;
-}); 
+// app.MapGet("api/v1/instructors", (Iinstructor instructorData) =>
+// {
+//     var instructors = instructorData.GetInstructors();
+//     return instructors;
+// }); 
 
 // app.MapGet("api/v1/instructors/{id}", (Iinstructor instructorData, int id) =>
 // {
@@ -46,23 +49,23 @@ app.MapGet("api/v1/instructors", (Iinstructor instructorData) =>
 //     return instructor;
 // });
 
-app.MapPost("api/v1/instructors", ( Iinstructor instructorData, Instructor instructor) =>
-{
-    var newInstructor = instructorData.AddInstructor(instructor);
-    return newInstructor;
-});
+// app.MapPost("api/v1/instructors", ( Iinstructor instructorData, Instructor instructor) =>
+// {
+//     var newInstructor = instructorData.AddInstructor(instructor);
+//     return newInstructor;
+// });
 
-app.MapPut("api/v1/instructors", (Iinstructor instructorData, Instructor instructor) =>
-{
-    var updatedInstructor = instructorData.UpdateInstructor(instructor);
-    return updatedInstructor;
-});
+// app.MapPut("api/v1/instructors", (Iinstructor instructorData, Instructor instructor) =>
+// {
+//     var updatedInstructor = instructorData.UpdateInstructor(instructor);
+//     return updatedInstructor;
+// });
 
-app.MapDelete("api/v1/instructors/{id}", (Iinstructor instructorData, int id) =>
-{
-    instructorData.DeleteInstructor(id);
-    return Results.NoContent();
-});
+// app.MapDelete("api/v1/instructors/{id}", (Iinstructor instructorData, int id) =>
+// {
+//     instructorData.DeleteInstructor(id);
+//     return Results.NoContent();
+// });
 
 // app.MapGet("api/v1/categories", (ICategory categoryData) =>
 // {
@@ -94,92 +97,32 @@ app.MapDelete("api/v1/instructors/{id}", (Iinstructor instructorData, int id) =>
 //     return Results.NoContent();  
 // });
 
-app.MapGet("api/v1/courses", (ICourse courseData) =>
+app.MapGet("api/v1/courses", (ICourse courseData, IMapper mapper) =>
 {
-    var courses = courseData.GetAllCourse();
-    var courseDTOs = courses.Select(course => new CourseDTO
-    {
-        CourseID = course.CourseID,
-        CourseName = course.CourseName,
-        CourseDescription = course.CourseDescription,
-        Duration = course.Duration,
-        category = new CategoryDTO
-        {
-            CategoryID = course.category.CategoryID,
-            CategoryName = course.category.CategoryName
-        },
-        Instructor = new InstructorDTO
-        {
-            InstructorID = course.Instructor.InstructorID,
-            InstructorName = course.Instructor.InstructorName
-        }
-    }).ToList();
-
-    return courseDTOs;
+    var courses = courseData.GetAllCourse(); 
+    var courseDTOs = mapper.Map<List<CourseDTO>>(courses); 
+    return Results.Ok(courseDTOs);
 });
 
-app.MapGet("api/v1/courses/{id}", (ICourse courseData, int id) =>
+app.MapGet("api/v1/courses/{id}", (ICourse courseData, IMapper mapper, int id) =>
 {
     var course = courseData.GetCourseByIdCourse(id);
+    if (course == null) return Results.NotFound($"Course ID {id} tidak ditemukan");
 
-    if (course == null)
-    {
-        return Results.NotFound($"Course dengan ID {id} tidak ditemukan.");
-    }
-    var courseDTO = new CourseDTO
-    {
-        CourseID = course.CourseID,
-        CourseName = course.CourseName,
-        CourseDescription = course.CourseDescription,
-        Duration = course.Duration,
-        category = course.category != null ? new CategoryDTO
-        {
-            CategoryID = course.category.CategoryID,
-            CategoryName = course.category.CategoryName
-        } : null,
-        Instructor = course.Instructor != null ? new InstructorDTO
-        {
-            InstructorID = course.Instructor.InstructorID,
-            InstructorName = course.Instructor.InstructorName
-        } : null
-    };
+    var courseDTO = mapper.Map<CourseDTO>(course);
     return Results.Ok(courseDTO);
 });
 
-app.MapPost("api/v1/courses", (ICourse courseData, CourseAddDTO dto)=>
+app.MapPost("api/v1/courses", (ICourse courseData, IMapper mapper ,CourseAddDTO dto)=>
 {
-     var course = new Course
-    {
-        CourseName = dto.CourseName,
-        CourseDescription = dto.CourseDescription,
-        Duration = dto.Duration,
-        CategoryID = dto.CategoryID,
-        InstructorID = dto.InstructorID
-    };
-
-    try
-    {
-        var newCourse = courseData.AddCourse(course);
-        return Results.Created($"/api/v1/courses/{newCourse.CourseID}", newCourse);
-    }
-    catch (Exception ex)
-    {
-        return Results.Problem("Error menambahkan course: " + ex.GetBaseException().Message);
-    }
+    var course = mapper.Map<Course>(dto);
+    var added = courseData.AddCourse(course);
+    return Results.Created($"/api/v1/courses/{added.CourseID}", added);
 });
 
-app.MapPut("api/v1/courses", (ICourse courseData, CourseUpdateDTO dto)=>
+app.MapPut("api/v1/courses", (ICourse courseData, IMapper mapper ,CourseUpdateDTO dto)=>
 {
-    var course = new Course
-    {
-        CourseID = dto.CourseID,
-        CourseName = dto.CourseName,
-        CourseDescription = dto.CourseDescription,
-        Duration = dto.Duration,
-        CategoryID = dto.CategoryID,
-        InstructorID = dto.InstructorID
-    };
-
+    var course = mapper.Map<Course>(dto);
     var updated = courseData.UpdateCourse(course);
     return updated != null
         ? Results.Ok(updated)

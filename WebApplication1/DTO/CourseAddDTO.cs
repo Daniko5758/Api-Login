@@ -11,7 +11,7 @@ namespace WebApplication1.DTO
     public string CourseDescription { get; set; }
     public double Duration { get; set; }
     public int CategoryID { get; set; }
-    public int InstructorID { get; set; } // Tambahan
+    public int InstructorID { get; set; } 
         
 
     }

@@ -26,10 +26,10 @@ namespace WebApplication1.Data
 
         public Course GetCourseByIdCourse(int id)
         {
-             return _context.Courses
-        .Include(c => c.category)
-        .Include(c => c.Instructor)
-        .FirstOrDefault(c => c.CourseID == id);
+            return _context.Courses
+            .Include(c => c.category)
+            .Include(c => c.Instructor)
+            .FirstOrDefault(c => c.CourseID == id);
         }
 
         public Course AddCourse(Course course)

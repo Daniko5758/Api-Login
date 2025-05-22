@@ -9,6 +9,5 @@ namespace WebApplication1.DTO
     {
         public int InstructorID { get; set; }
         public string InstructorName { get; set; } = null!;
-        
     }
 }
