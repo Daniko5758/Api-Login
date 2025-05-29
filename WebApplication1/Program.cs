@@ -26,6 +26,7 @@ builder.Services.AddScoped<ICategory, CategoryEF>();
 builder.Services.AddScoped<ICourse, CourseEF>();
 builder.Services.AddScoped<Iinstructor, InstructorEF>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddScoped<IAspUser, AspUserEF>();
 var app = builder.Build();
 
 
@@ -36,6 +37,33 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapGet("api/v1/cekpassword/{passowrd}", (string passowrd) =>
+{
+    var pass = WebApplication1.Helper.HashHelper.HashPassword(passowrd);
+    return Results.Ok($"password: {passowrd} hass: {pass}");
+});
+
+//register user
+app.MapPost("api/v1/register", (IAspUser aspUserData, AspUser user) =>
+{
+    var newUser = aspUserData.RegisterUser(user);
+    return Results.Created($"/api/v1/users/{newUser.Username}", newUser);
+});
+
+app.MapPost("api/v1/login", (IAspUser aspUserData, AspUser loginRequest) =>
+{
+    bool success = aspUserData.login(loginRequest.Username, loginRequest.Password);
+    if (!success)
+    {
+        return Results.Unauthorized();
+    }
+
+    var user = aspUserData.GetUserByUsername(loginRequest.Username);
+    return Results.Ok(new { message = "Login successful", username = user.Username });
+});
+
+
 
 // app.MapGet("api/v1/instructors", (Iinstructor instructorData) =>
 // {
@@ -135,6 +163,7 @@ app.MapDelete("api/v1/courses/{id}", (ICourse courseData, int id) =>
         ? Results.Ok($"Course dengan ID {id} berhasil dihapus.")
         : Results.NotFound($"Course dengan ID {id} tidak ditemukan.");
 });
+
 
 app.Run();
 
